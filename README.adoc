@@ -1,0 +1,62 @@
+= Koncourse
+
+Koncourse is a https://kotlinlang.org/[Kotlin] based tool for creating https://concourse-ci.org/[Concourse CI] pipelines.
+
+Because we love Concourse but we hate YAML.
+
+Configuration As Code is great and YAML is human-friendly, until it isn't.
+
+This is a proof of concept to compare how a fully programmatic approach compares to a DSL one.
+
+== SDK
+
+hello-world.kt
+[source,kotlin]
+----
+import com.albertoimpl.koncourse.sdk.*
+
+fun main(args: Array<String>) {
+    val result = Pipeline(
+            listOf(
+                    Job("hello-world",
+                            listOf(
+                                    Plan("say-hello",
+                                            Config("linux",
+                                                    ImageResource("docker-image", Repository("alpine")),
+                                                    Run("echo", listOf("Hello, world!"))
+                                            )
+                                    )
+                            )
+                    )
+            )
+    )
+
+    generate("hello-world.yml", result)
+}
+----
+
+will output:
+
+hello-world.yml
+[source,yaml]
+----
+jobs:
+- name: "hello-world"
+  plan:
+  - task: "say-hello"
+    config:
+      platform: "linux"
+      image_resource:
+        type: "docker-image"
+        source:
+          repository: "alpine"
+      run:
+        path: "echo"
+        args:
+        - "Hello, world!"
+----
+
+== DSL
+
+// TODO
+
